@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-02T17:31:15.642Z",
+  "url": "http://localhost:4173",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "devicePixelRatio": 1,
+    "cpuThreads": 16,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "playedMatch": {
+    "options": {
+      "sessionSeconds": 180,
+      "spawnSeconds": 3
+    },
+    "frames": 25908,
+    "averageFps": 144,
+    "p95FrameMs": 7.1,
+    "maxFrameMs": 13.9,
+    "framesOver20Ms": 0,
+    "averageEntities": 3.1,
+    "maxEntities": 6,
+    "score": 50
+  },
+  "crowdedMatch": {
+    "options": {
+      "sessionSeconds": 180,
+      "spawnSeconds": 1
+    },
+    "frames": 22922,
+    "averageFps": 143.98,
+    "p95FrameMs": 7.1,
+    "maxFrameMs": 21,
+    "framesOver20Ms": 1,
+    "averageEntities": 54.56,
+    "maxEntities": 118,
+    "score": 0
+  },
+  "memory": [
+    {
+      "cycle": 0,
+      "jsHeapMb": 6.22,
+      "domNodes": 48,
+      "eventListeners": 5
+    },
+    {
+      "cycle": 1,
+      "jsHeapMb": 8.58,
+      "domNodes": 298,
+      "eventListeners": 221
+    },
+    {
+      "cycle": 2,
+      "jsHeapMb": 8.85,
+      "domNodes": 298,
+      "eventListeners": 221
+    },
+    {
+      "cycle": 3,
+      "jsHeapMb": 9.05,
+      "domNodes": 298,
+      "eventListeners": 221
+    },
+    {
+      "cycle": 4,
+      "jsHeapMb": 9.1,
+      "domNodes": 298,
+      "eventListeners": 221
+    },
+    {
+      "cycle": 5,
+      "jsHeapMb": 9.24,
+      "domNodes": 298,
+      "eventListeners": 221
+    }
+  ]
+}

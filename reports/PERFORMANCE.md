@@ -25,13 +25,13 @@ pnpm profile          # in another; takes about 8 minutes
 [scripts/profile.mjs](../scripts/profile.mjs) drives the real game with the real clock. Frame intervals are collected
 with `requestAnimationFrame` inside the page; entity counts (player + enemies + projectiles) are sampled every 100 ms.
 
-- **Played match:** a scripted pilot holds forward and fire and steers at the nearest enemy.
-- **Crowded match:** the player stays idle with a 1 s spawn interval, so shooters and their projectiles accumulate.
+- In the played match a scripted pilot holds forward and fire and steers at the nearest enemy.
+- In the crowded match the player stays idle with a 1 s spawn interval, so shooters and their projectiles accumulate.
   This is the worst case for entity count.
 - In both, the script refills the player's health on every sample so the match can last. This is the only state the
   profiler changes.
-- **Memory:** five cycles of start, play 10 s, pause, exit to the menu. After each cycle the script forces a garbage
-  collection and reads the JS heap, DOM node count and event listener count from the DevTools protocol.
+- The memory test runs five cycles of start, play 10 s, pause, exit to the menu. After each cycle the script forces
+  a garbage collection and reads the JS heap, DOM node count and event listener count from the DevTools protocol.
 
 ## Frame pacing
 
@@ -77,6 +77,6 @@ renderer would cost far more than 15 KB per cycle; the curve is consistent with 
 - The crowded match ended at about 159 s: with more than a hundred shooters firing, the player was sunk between two
   health refills. Its numbers cover those 159 s.
 - Measured headless. Chromium picked the integrated GPU; the laptop's discrete GPU was not used.
-- With vsync at 143 Hz the frame rate is capped by the display, so these numbers show headroom, not the maximum.
+- With vsync at 143 Hz the frame rate is capped by the display, so the game could run faster than these numbers show.
 - No mobile device was profiled. Tests cover the mobile layout on an emulated phone only.
 - Each sprite is created and destroyed with its entity. At these entity counts pooling was not needed.

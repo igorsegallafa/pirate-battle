@@ -71,6 +71,17 @@ export function isOnIsland(point: Point): boolean {
   })
 }
 
+const SIGHT_SAMPLE_SPACING = 8
+
+export function isSightBlocked(from: Point, to: Point): boolean {
+  const samples = Math.ceil(Math.hypot(to.x - from.x, to.y - from.y) / SIGHT_SAMPLE_SPACING)
+  for (let i = 1; i < samples; i++) {
+    const t = i / samples
+    if (isOnIsland({ x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t })) return true
+  }
+  return false
+}
+
 export function isInsideArena(point: Point): boolean {
   return point.x >= 0 && point.x <= ARENA.width && point.y >= 0 && point.y <= ARENA.height
 }
@@ -102,6 +113,6 @@ function pushOutFromCenter(body: Point, island: Island, minDistance: number): vo
   else body.y = island.y + (Math.sign(dy) || 1) * half
 }
 
-export function clamp(value: number, min: number, max: number): number {
+function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
 }

@@ -20,8 +20,8 @@ src/
   storage.ts   tiny store + localStorage helper
 ```
 
-Dependencies point one way: `ui` → `game/session` → `simulation`. The simulation imports only `arena` and `config`, so the
-rules run without a browser, a renderer or React.
+Dependencies point one way: `ui` imports `game/session`, which imports `simulation`. The simulation itself imports
+only `arena` and `config`, so the rules run without a browser, a renderer or React.
 
 ## React and PixiJS
 
@@ -31,11 +31,12 @@ and the health bars above ships.
 `GameScreen` mounts an empty `div` and, in an effect, loads the textures and calls `GameSession.start`. The effect's
 cleanup destroys the session. Both steps are asynchronous, so the effect passes an `AbortSignal`: if the cleanup runs
 while PixiJS is still initializing, the half-built application is destroyed and no session is created. That makes
-mount → unmount → mount (React Strict Mode) safe. "Play Again" remounts `GameScreen` with a new `key`, so every match gets a fresh session.
+mounting, unmounting and mounting again (React Strict Mode) safe. "Play Again" remounts `GameScreen` with a new
+`key`, so every match gets a fresh session.
 
 The continuous state (positions, cooldowns, timers) lives only in the `Match` object. React never reads it. The session
 publishes a small `HudState` (phase, score, whole seconds left, health) to a store and only writes to it when one of
-those values changes, so React renders a few times per second at most, never per frame. Components subscribe with
+those values changes, so React renders at most a few times per second. Components subscribe with
 `useSyncExternalStore`.
 
 The arena is a CSS box with a fixed 16:9 aspect ratio that fits the viewport. Pixi resizes its canvas to that box
@@ -49,11 +50,14 @@ Landscape is the supported mobile orientation; portrait still works at a smaller
 
 `stepMatch(match, input, dt)` advances the rules by a fixed step of 1/60 s. On every Pixi ticker frame the session adds
 the frame time to an accumulator and runs as many fixed steps as fit, then renders once. Movement, damage, cooldowns
-and spawns therefore depend on elapsed time, not on the frame rate. A frame longer than 250 ms is clamped.
+and spawns therefore depend only on elapsed time, whatever the frame rate. A frame longer than 250 ms is clamped.
 
 One step, in order: player movement and weapons, spawn, enemy steering and attacks, enemy separation, projectiles,
 removal of destroyed enemies, end conditions. Once `endReason` is set every later step returns immediately, which stops
 movement, attacks, damage, spawns and scoring together.
+
+When a match ends the session reports the result at once, so it is stored and sent even if the page is closed during
+the final explosion, and asks React to show the result screen 1.2 s later.
 
 The simulation reports what happened through `match.events` (shot, hit, miss, destroyed). After each frame the session
 hands them to the renderer (effects) and to the audio module, then clears the list. The rules never call presentation
@@ -63,16 +67,16 @@ Randomness comes from a mulberry32 generator whose state is a number inside the 
 `?seed=`. A match is plain serializable data.
 
 Pause sets the HUD phase to `paused`: frames return early, so the clock, cooldowns and simulation stop. Pausing also
-detaches the keyboard listener and clears the input state; resuming resets the accumulator. Nothing from the paused
-period can leak into the match. The window `blur` and `visibilitychange` events pause automatically, and only the
+detaches the keyboard listener and clears the input state, and resuming resets the accumulator, so no movement or
+shots from the paused period reach the match. The window `blur` and `visibilitychange` events pause automatically, and only the
 player resumes (Resume button or Esc in the dialog). The pause dialog is a native modal `<dialog>`, which provides the
 focus trap and focus restoration.
 
 ## Enemies
 
-- **Chaser** steers at the player and advances. On contact it damages the player and is destroyed without scoring.
-- **Shooter** advances until the player is within `attackRange` with a clear line, then stops, turns to face the player
-  and fires when aligned.
+- A chaser steers at the player and advances. On contact it damages the player and is destroyed without scoring.
+- A shooter advances until the player is within `attackRange` and no island crosses the line between them, then
+  stops, turns to face the player and fires when aligned.
 
 Both steer around islands: if an island's bounding circle blocks the straight line to the player, the course bends to
 the edge of that circle. Enemies that overlap are pushed apart, and an enemy overlapping the player is pushed away.
@@ -129,13 +133,17 @@ Contracts are in `src/api/contracts.ts` and shared by the client and the mock ha
 Ranking order is score descending, then earlier `playedAt`, then `id`. Each match is one ranking entry, compared only
 with matches that used the same options.
 
-**Queries.** `useRanking` and `useMatchHistory` use keys that include the options/player and the page, with
+### Queries
+
+`useRanking` and `useMatchHistory` use keys that include the options/player and the page, with
 `keepPreviousData` so paging does not flash. Queries are stale immediately, so opening a tab again refetches in the
 background while cached data is shown. The Axios call receives TanStack Query's abort signal. A response only ever
 fills the cache entry of its own key and a superseded request is cancelled, so a late response cannot replace newer
 data. Requests retry twice, except on 4xx.
 
-**Registering a match.** The record id is generated on the client when the match ends, and the API is idempotent on
+### Registering a match
+
+The record id is generated on the client when the match ends, and the API is idempotent on
 that id. The record is first appended to `pending-matches`, then sent by a mutation. On success it is removed from the
 pending list and both the `ranking` and `history` queries are invalidated. On failure it stays pending: the result
 screen and the main menu show "not saved yet" with a Retry button, and every app start sends the pending records again.
@@ -171,7 +179,8 @@ All values are in `src/game/config.ts`.
   UI use the 2× assets.
 - Collision shapes are approximations: circles for ships, rounded squares for islands.
 - Enemy steering is local. It handles the convex islands of this arena, not arbitrary mazes.
-- A shooter decides whether it has a clear shot using the island's bounding circle, so it can keep approaching in a
-  few positions where the line of fire is actually free.
+- Each action is a single on/off flag shared by the keyboard and the touch buttons. Holding two inputs for the same
+  action and releasing one stops the action.
+- Stores read `localStorage` once at startup, so two tabs open at the same time can overwrite each other's records.
 - There is no enemy cap. With long sessions and a 1 s spawn interval the arena gets crowded by design.
 - Visual regression baselines are per platform; the committed ones are for Windows.

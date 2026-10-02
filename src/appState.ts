@@ -1,6 +1,6 @@
 import type { MatchRecord } from './api/contracts'
 import { DEFAULT_OPTIONS, isValidOption, type MatchOptions } from './game/config'
-import { STORAGE_PREFIX, createPersistentStore } from './storage'
+import { createPersistentStore } from './storage'
 
 export const optionsStore = createPersistentStore<MatchOptions>(
   'options',
@@ -12,14 +12,7 @@ export const lastResultStore = createPersistentStore<MatchRecord | null>('last-r
 
 export const pendingMatchesStore = createPersistentStore<MatchRecord[]>('pending-matches', [])
 
-export const PLAYER = { id: loadPlayerId(), name: 'Captain Jack' }
+const playerIdStore = createPersistentStore('player-id', '')
+if (!playerIdStore.get()) playerIdStore.set(crypto.randomUUID())
 
-function loadPlayerId(): string {
-  const key = `${STORAGE_PREFIX}player-id`
-  let id = localStorage.getItem(key)
-  if (!id) {
-    id = crypto.randomUUID()
-    localStorage.setItem(key, id)
-  }
-  return id
-}
+export const PLAYER = { id: playerIdStore.get(), name: 'Captain Jack' }

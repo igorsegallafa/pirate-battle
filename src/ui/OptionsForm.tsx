@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { optionsStore } from '../appState'
 import { OPTION_LIMITS, isValidOption, type MatchOptions } from '../game/config'
-import { clamp } from '../game/arena'
 import { MenuButton, RoundButton } from './components'
 
 type OptionName = keyof MatchOptions
@@ -34,7 +33,8 @@ export function OptionsForm({ backLabel, onBack }: Props) {
   const stepBy = (name: OptionName, direction: 1 | -1) => {
     const { min, max, step } = OPTION_LIMITS[name]
     const current = Number(draft[name])
-    change(name, String(Number.isFinite(current) ? clamp(current + direction * step, min, max) : min))
+    const stepped = Math.min(max, Math.max(min, current + direction * step))
+    change(name, String(Number.isFinite(current) ? stepped : min))
   }
 
   const save = (event: FormEvent) => {

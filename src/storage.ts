@@ -6,7 +6,7 @@ export interface Store<T> {
   subscribe(listener: () => void): () => void
 }
 
-export const STORAGE_PREFIX = 'pirate-battle:'
+const STORAGE_PREFIX = 'pirate-battle:'
 
 export function createStore<T>(initial: T): Store<T> {
   let value = initial
@@ -31,8 +31,12 @@ export function createPersistentStore<T>(name: string, fallback: T, isValid: (va
   return {
     ...store,
     set(value) {
-      localStorage.setItem(key, JSON.stringify(value))
       store.set(value)
+      try {
+        localStorage.setItem(key, JSON.stringify(value))
+      } catch {
+        // Storage full or blocked: the value still applies for this visit.
+      }
     },
   }
 }

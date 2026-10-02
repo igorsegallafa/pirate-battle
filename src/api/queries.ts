@@ -45,8 +45,8 @@ export function useMatchSubmission() {
   const { mutate } = useMutation({
     mutationKey: SUBMIT_MATCH_KEY,
     mutationFn: submitMatch,
-    onSuccess(saved) {
-      pendingMatchesStore.set(pendingMatchesStore.get().filter((match) => match.id !== saved.id))
+    onSuccess(_saved, record) {
+      pendingMatchesStore.set(pendingMatchesStore.get().filter((match) => match.id !== record.id))
       client.invalidateQueries({ queryKey: ['ranking'] })
       client.invalidateQueries({ queryKey: ['history'] })
     },

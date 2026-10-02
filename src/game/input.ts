@@ -19,6 +19,7 @@ export function listenToKeyboard(input: InputState, onPause: () => void): () => 
   const listeners = new AbortController()
 
   const onKey = (event: KeyboardEvent) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return
     const action = KEY_BINDINGS[event.code]
     if (action) {
       input[action] = event.type === 'keydown'

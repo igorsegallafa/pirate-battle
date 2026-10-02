@@ -40,7 +40,6 @@ export function App() {
     }
     lastResultStore.set(record)
     submit(record)
-    setScreen('result')
   }
 
   const goToMenu = () => setScreen('menu')
@@ -58,7 +57,9 @@ export function App() {
         </main>
       )
     case 'game':
-      return <GameScreen key={matchNumber} onEnd={recordMatch} onExit={goToMenu} />
+      return (
+        <GameScreen key={matchNumber} onEnd={recordMatch} onShowResult={() => setScreen('result')} onExit={goToMenu} />
+      )
     case 'result':
       return (
         <main className="screen">

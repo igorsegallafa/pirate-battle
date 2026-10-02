@@ -56,8 +56,8 @@ the tab is hidden, and only resumes when you choose Resume. On mobile, play in l
 
 Every gameplay value lives in the typed `GameConfig` in [src/game/config.ts](src/game/config.ts): session length,
 spawn interval, spawn sequence and minimum spawn distance, ship health, speed, turn speed and radius, weapon damage,
-cooldown, projectile speed and range, chaser contact damage and shooter attack range. Changing balance means editing
-that object; the systems read it.
+cooldown, projectile speed and range, chaser contact damage and shooter attack range. To rebalance the game, edit
+that object. The game systems only read values from it.
 
 The Options screen exposes two of them. Each match snapshots the options when it starts.
 
@@ -71,8 +71,8 @@ The Options screen exposes two of them. Each match snapshots the options when it
 The API only exists as MSW handlers, which also run in the published build. Records confirmed by the mock and records
 still waiting to be sent are kept in `localStorage`, so they survive a refresh.
 
-Select a scenario in the **Mock API** panel at the bottom-left of the main menu, or with `?scenario=<name>` in the URL.
-The choice is remembered. **Reset all data** in the same panel clears every stored value (options, results, pending
+Select a scenario in the "Mock API" panel at the bottom left of the main menu, or with `?scenario=<name>` in the URL.
+The choice is remembered, and the parameter is removed from the address once applied. "Reset all data" in the same panel clears every stored value (options, results, pending
 and confirmed records, scenario) and reloads.
 
 | Scenario | Behaviour |
@@ -96,17 +96,22 @@ Scenarios are defined in [src/mocks/scenarios.ts](src/mocks/scenarios.ts).
 
 ### Reproducing failures
 
-- **List failure:** select `ranking-error`, open Ranking. After the retries an error with "Try again" appears; Match
-  History still loads. Switch to `success` and try again.
-- **Outage when the match ends:** select `submit-unavailable`, finish a match. The result shows "Battle record not
-  saved yet". You can play again meanwhile. Refresh the page: the record is still pending. Select `success` and press
-  Retry (or refresh): it is saved and appears in both tabs.
-- **Timeout after registering:** select `submit-timeout`, finish a match and wait for "not saved yet". The mock has
-  already stored it. Select `success` and press Retry: the match appears exactly once in Ranking and Match History.
-- **Late responses:** select `out-of-order`, open Ranking, press Next twice and Previous right away. The slow page-3
-  response arrives later and the screen stays on page 2.
-- **Asset failure:** go offline in the browser devtools before pressing Play. The loading screen reports the failure;
-  go back online and press "Try again".
+A list that fails to load: select `ranking-error` and open Ranking. After the retries an error with "Try again"
+appears, while Match History still loads. Switch to `success` and try again.
+
+An outage when the match ends: select `submit-unavailable` and finish a match. The result shows "Battle record not
+saved yet", and you can play again meanwhile. Refresh the page and the record is still pending. Select `success` and
+press Retry (or refresh) to save it; it then appears in both tabs.
+
+A timeout after the match was registered: select `submit-timeout`, finish a match and wait for "not saved yet". The
+mock has already stored it. Select `success` and press Retry. The match appears exactly once in Ranking and in Match
+History.
+
+Late responses: select `out-of-order`, open Ranking, press Next twice and then Previous right away. The slow
+response for page 3 arrives later and the screen stays on page 2.
+
+An asset failure: go offline in the browser devtools before pressing Play. The loading screen reports the failure.
+Go back online and press "Try again".
 
 ## Other URL parameters
 

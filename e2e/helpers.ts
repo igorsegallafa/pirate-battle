@@ -43,7 +43,6 @@ export function matchState(page: Page): Promise<Match> {
   return page.evaluate(() => window.__pirateBattle!.match)
 }
 
-/** Runs the simulation for this much game time and returns the resulting state. */
 export function advance(page: Page, milliseconds: number): Promise<Match> {
   return page.evaluate((ms) => {
     window.__pirateBattle!.advance(ms)
@@ -74,13 +73,12 @@ function bearingTo(player: Ship, target: Ship): number {
 
 const AIM_TOLERANCE = 0.03
 
-/** Turns the player with the keyboard until its bow points at the target. */
 export async function aimAt(page: Page, targetId: number): Promise<Match> {
   let match = await matchState(page)
   for (;;) {
     const target = match.enemies.find((enemy) => enemy.id === targetId)
     const bearing = target ? bearingTo(match.player, target) : 0
-    if (Math.abs(bearing) < AIM_TOLERANCE) return match
+    if (Math.abs(bearing) < AIM_TOLERANCE || match.endReason) return match
 
     const turnMs = (Math.abs(bearing) / match.config.player.turnSpeed) * 1000
     match = await holdKey(page, bearing > 0 ? 'KeyD' : 'KeyA', Math.max(FRAME_MS, turnMs))

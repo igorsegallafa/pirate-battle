@@ -32,12 +32,11 @@ async function startMatch() {
   await page.waitForFunction(() => window.__pirateBattle !== undefined)
 }
 
-/** Steers at the nearest enemy and keeps the player alive, so the match always runs its full length. */
+/** Reads the match and the bearing to the nearest enemy. */
 function pilot() {
   return page.evaluate(() => {
     const { match } = window.__pirateBattle
     const { player, enemies } = match
-    player.health = player.maxHealth
 
     const target = enemies.reduce(
       (nearest, enemy) =>
@@ -48,7 +47,8 @@ function pilot() {
     )
     const offset = target ? Math.atan2(target.y - player.y, target.x - player.x) - player.heading : 0
     return {
-      ended: match.endReason !== null,
+      endReason: match.endReason,
+      durationSeconds: match.elapsedSeconds,
       score: match.score,
       entities: 1 + enemies.length + match.projectiles.length,
       bearing: Math.atan2(Math.sin(offset), Math.cos(offset)),
@@ -71,9 +71,12 @@ async function profileMatch(options, fights) {
   await page.evaluate(() => {
     window.frameTimes = []
     let last = performance.now()
+    // The player is healed every frame so the match runs its full length.
     const record = (now) => {
       window.frameTimes.push(now - last)
       last = now
+      const player = window.__pirateBattle?.match.player
+      if (player) player.health = player.maxHealth
       requestAnimationFrame(record)
     }
     requestAnimationFrame(record)
@@ -83,7 +86,7 @@ async function profileMatch(options, fights) {
   for (const key of heldKeys) await page.keyboard.down(key)
   const entityCounts = []
   let state = await pilot()
-  while (!state.ended) {
+  while (!state.endReason) {
     entityCounts.push(state.entities)
     if (fights) await steer(state.bearing)
     await page.waitForTimeout(POLL_MS)
@@ -97,6 +100,8 @@ async function profileMatch(options, fights) {
 
   return {
     options,
+    endReason: state.endReason,
+    durationSeconds: round(state.durationSeconds),
     frames: frameTimes.length,
     averageFps: round((frameTimes.length / totalMs) * 1000),
     p95FrameMs: round(frameTimes[Math.floor(frameTimes.length * 0.95)]),

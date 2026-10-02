@@ -10,10 +10,11 @@ import { TouchControls } from './TouchControls'
 
 interface Props {
   onEnd: (summary: MatchSummary, options: MatchOptions) => void
+  onShowResult: () => void
   onExit: () => void
 }
 
-export function GameScreen({ onEnd, onExit }: Props) {
+export function GameScreen({ onEnd, onShowResult, onExit }: Props) {
   const arenaRef = useRef<HTMLDivElement>(null)
   const [options] = useState(optionsStore.get)
   const [session, setSession] = useState<GameSession | null>(null)
@@ -22,6 +23,7 @@ export function GameScreen({ onEnd, onExit }: Props) {
   const [attempt, setAttempt] = useState(0)
 
   const endMatch = useEffectEvent((summary: MatchSummary) => onEnd(summary, options))
+  const showResult = useEffectEvent(onShowResult)
 
   useEffect(() => {
     const arena = arenaRef.current
@@ -31,7 +33,10 @@ export function GameScreen({ onEnd, onExit }: Props) {
     let started: GameSession | undefined
 
     loadGameTextures(setLoadProgress)
-      .then((textures) => GameSession.start(arena, textures, createGameConfig(options), endMatch, cancellation.signal))
+      .then((textures) => {
+        const callbacks = { onEnd: endMatch, onLeave: showResult }
+        return GameSession.start(arena, textures, createGameConfig(options), callbacks, cancellation.signal)
+      })
       .then((newSession) => {
         started = newSession
         if (newSession) setSession(newSession)

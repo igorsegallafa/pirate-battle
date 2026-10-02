@@ -31,6 +31,12 @@ export interface MatchSummary {
   endReason: EndReason
 }
 
+export interface SessionCallbacks {
+  /** Called the moment the match ends, so the result is recorded even if the page closes right after. */
+  onEnd: (summary: MatchSummary) => void
+  onLeave: () => void
+}
+
 const urlParams = new URLSearchParams(location.search)
 const TEST_API_ENABLED = urlParams.has('e2e')
 const MANUAL_CLOCK = urlParams.get('clock') === 'manual'
@@ -39,7 +45,7 @@ const FIXED_SEED = urlParams.get('seed')
 /** A longer frame (a stalled tab, a breakpoint) is cut short instead of fast-forwarding the match. */
 const MAX_FRAME_SECONDS = 0.25
 /** Lets the final explosion play before the result screen replaces the arena. */
-const RESULT_DELAY_MS = 1200
+const LEAVE_DELAY_MS = 1200
 const LOW_HEALTH_RATIO = 0.3
 const TIME_WARNING_SECONDS = 10
 
@@ -51,16 +57,17 @@ export class GameSession {
   private unspentSeconds = 0
   private stopKeyboard = () => {}
   private listeners = new AbortController()
-  private resultTimer?: number
+  private leaveTimer?: number
 
   /** Resolves to nothing when cancelled while PixiJS was still initializing. */
   static async start(
     container: HTMLElement,
     textures: GameTextures,
     config: GameConfig,
-    onEnd: (summary: MatchSummary) => void,
+    callbacks: SessionCallbacks,
     cancellation: AbortSignal,
   ): Promise<GameSession | undefined> {
+    if (cancellation.aborted) return
     const app = new Application()
     await app.init({ resizeTo: container, resolution: window.devicePixelRatio, autoDensity: true })
     if (cancellation.aborted) {
@@ -68,14 +75,14 @@ export class GameSession {
       return
     }
     container.appendChild(app.canvas)
-    return new GameSession(app, textures, config, onEnd)
+    return new GameSession(app, textures, config, callbacks)
   }
 
   private constructor(
     private app: Application,
     textures: GameTextures,
     config: GameConfig,
-    private onEnd: (summary: MatchSummary) => void,
+    private callbacks: SessionCallbacks,
   ) {
     this.match = createMatch(config, FIXED_SEED ? Number(FIXED_SEED) : Date.now())
     this.hud = createStore<HudState>({ phase: 'running', ...this.hudValues() })
@@ -98,7 +105,7 @@ export class GameSession {
   pause = (): void => {
     if (this.hud.get().phase !== 'running') return
     this.releaseControls()
-    this.hud.set({ ...this.hud.get(), phase: 'paused' })
+    this.setPhase('paused')
     playSound('game_pause')
   }
 
@@ -106,7 +113,7 @@ export class GameSession {
     if (this.hud.get().phase !== 'paused') return
     this.unspentSeconds = 0
     this.stopKeyboard = listenToKeyboard(this.input, this.pause)
-    this.hud.set({ ...this.hud.get(), phase: 'running' })
+    this.setPhase('running')
     playSound('game_resume')
   }
 
@@ -117,7 +124,7 @@ export class GameSession {
   destroy(): void {
     this.releaseControls()
     this.listeners.abort()
-    window.clearTimeout(this.resultTimer)
+    window.clearTimeout(this.leaveTimer)
     this.app.ticker.remove(this.onTick)
     this.renderer.destroy()
     this.app.destroy(true, { children: true })
@@ -193,11 +200,15 @@ export class GameSession {
 
   private finish(endReason: EndReason): void {
     this.releaseControls()
-    this.hud.set({ ...this.hud.get(), phase: 'ended' })
+    this.setPhase('ended')
     playSound(endReason === 'time_up' ? 'game_complete' : 'game_over')
 
-    const summary = { score: this.match.score, durationSeconds: Math.round(this.match.elapsedSeconds), endReason }
-    this.resultTimer = window.setTimeout(() => this.onEnd(summary), RESULT_DELAY_MS)
+    this.callbacks.onEnd({ score: this.match.score, durationSeconds: Math.round(this.match.elapsedSeconds), endReason })
+    this.leaveTimer = window.setTimeout(this.callbacks.onLeave, LEAVE_DELAY_MS)
+  }
+
+  private setPhase(phase: HudState['phase']): void {
+    this.hud.set({ ...this.hud.get(), phase })
   }
 
   private releaseControls(): void {

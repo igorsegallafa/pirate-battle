@@ -58,10 +58,20 @@ export const SCENARIOS = {
 
 export type ScenarioName = keyof typeof SCENARIOS
 
-export const scenarioStore = createPersistentStore<ScenarioName>('scenario', 'success', (name) => name in SCENARIOS)
+function isScenarioName(name: string): name is ScenarioName {
+  return Object.hasOwn(SCENARIOS, name)
+}
 
-const requested = new URLSearchParams(location.search).get('scenario')
-if (requested && requested in SCENARIOS) scenarioStore.set(requested as ScenarioName)
+export const scenarioStore = createPersistentStore<ScenarioName>('scenario', 'success', isScenarioName)
+
+// Applied once and dropped from the address, so a later choice in the panel survives a refresh.
+const url = new URL(location.href)
+const requested = url.searchParams.get('scenario')
+if (requested !== null) {
+  if (isScenarioName(requested)) scenarioStore.set(requested)
+  url.searchParams.delete('scenario')
+  history.replaceState(null, '', url)
+}
 
 export function currentScenario(): Scenario {
   return SCENARIOS[scenarioStore.get()]

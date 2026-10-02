@@ -5,6 +5,7 @@ import {
   constrainToWater,
   isInsideArena,
   isOnIsland,
+  isSightBlocked,
   islandBoundingRadius,
   type Point,
 } from './arena'
@@ -135,10 +136,9 @@ function updateEnemy(match: Match, enemy: Ship, dt: number): void {
   coolDown(enemy, dt)
 
   const toPlayer = angleBetween(enemy, player)
-  const course = courseAroundIslands(enemy, player)
-  const hasClearShot = course === toPlayer
+  const inRange = distance(enemy, player) <= config.shooter.attackRange
 
-  if (enemy.kind === 'shooter' && hasClearShot && distance(enemy, player) <= config.shooter.attackRange) {
+  if (enemy.kind === 'shooter' && inRange && !isSightBlocked(enemy, player)) {
     turnToward(enemy, toPlayer, config.shooter.turnSpeed * dt)
     if (Math.abs(normalizeAngle(toPlayer - enemy.heading)) < AIM_TOLERANCE) {
       fireFront(match, enemy, config.shooter.cannon)
@@ -147,7 +147,7 @@ function updateEnemy(match: Match, enemy: Ship, dt: number): void {
   }
 
   const shipConfig = config[enemy.kind]
-  turnToward(enemy, course, shipConfig.turnSpeed * dt)
+  turnToward(enemy, courseAroundIslands(enemy, player), shipConfig.turnSpeed * dt)
   advance(enemy, shipConfig.speed * dt)
 
   if (enemy.kind === 'chaser' && distance(enemy, player) < enemy.radius + player.radius) {

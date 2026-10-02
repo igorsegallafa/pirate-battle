@@ -1,6 +1,5 @@
 import type { Match } from './simulation'
 
-/** Exposed on `window.__pirateBattle` when the URL has `?e2e`, for automated tests and profiling. */
 export interface TestApi {
   match: Match
   /** Runs the simulation and rendering for this much game time. Needs `&clock=manual`. */
@@ -9,6 +8,7 @@ export interface TestApi {
 
 declare global {
   interface Window {
+    /** Only set when the URL has `?e2e`, for automated tests and profiling. */
     __pirateBattle?: TestApi
   }
 }

@@ -1,10 +1,10 @@
+// Distances are in pixels, angles in radians and speeds per second.
+
 export type EnemyKind = 'chaser' | 'shooter'
 
 export interface ShipConfig {
   maxHealth: number
-  /** Pixels per second. */
   speed: number
-  /** Radians per second. */
   turnSpeed: number
   radius: number
 }
@@ -12,15 +12,13 @@ export interface ShipConfig {
 export interface WeaponConfig {
   damage: number
   cooldownSeconds: number
-  /** Pixels per second. */
   projectileSpeed: number
-  /** Pixels travelled before the projectile expires; its lifetime is range / speed. */
+  /** Distance travelled before the projectile expires; its lifetime is range / speed. */
   projectileRange: number
 }
 
 export interface BroadsideConfig extends WeaponConfig {
   projectileCount: number
-  /** Distance between parallel projectiles, in pixels. */
   projectileSpacing: number
 }
 

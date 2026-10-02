@@ -12,6 +12,32 @@ export function uiImage(name: string): string {
   return `${ASSETS_URL}ui/${name}.png`
 }
 
+/** Drawn by the HUD in the DOM; fetched with the textures so the HUD never appears half-painted. */
+const HUD_IMAGES = [
+  'health_frame',
+  'health_fill_green',
+  'health_fill_amber',
+  'health_fill_red',
+  'counter_panel',
+  'icon_heart',
+  'icon_score',
+  'icon_time',
+  'icon_pause',
+  'icon_forward',
+  'icon_turn_left',
+  'icon_turn_right',
+  'icon_fire_front',
+  'icon_fire_left',
+  'icon_fire_right',
+  'button_round_normal',
+]
+
+function preloadImage(url: string): Promise<void> {
+  const image = new Image()
+  image.src = url
+  return image.decode()
+}
+
 type TileName = IslandTexture | DecorationTexture
 
 /** Regions of the tile sheet, in logical pixels. */
@@ -40,7 +66,10 @@ let textures: GameTextures | undefined
 export async function loadGameTextures(onProgress: (progress: number) => void): Promise<GameTextures> {
   if (textures) return textures
 
-  const loaded = await Assets.load([SHIPS_ATLAS, UI_ATLAS, TILES_SHEET, WATER_TILE], onProgress)
+  const [loaded] = await Promise.all([
+    Assets.load([SHIPS_ATLAS, UI_ATLAS, TILES_SHEET, WATER_TILE], onProgress),
+    ...HUD_IMAGES.map((name) => preloadImage(uiImage(name))),
+  ])
   textures ??= buildTextures(loaded[SHIPS_ATLAS], loaded[UI_ATLAS], loaded[TILES_SHEET], loaded[WATER_TILE])
   return textures
 }

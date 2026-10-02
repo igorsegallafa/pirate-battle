@@ -22,7 +22,7 @@ export const SCENARIOS = {
   success: { description: 'Everything works.', fixtures: 'standard', latencyMs: FAST, failures: {} },
   empty: { description: 'No other captains; lists start empty.', fixtures: 'none', latencyMs: FAST, failures: {} },
   'many-pages': { description: 'Long ranking and match history.', fixtures: 'many', latencyMs: FAST, failures: {} },
-  slow: { description: 'Every response takes 2.5 s.', fixtures: 'standard', latencyMs: [2500], failures: {} },
+  slow: { description: 'Every response takes 1.5 s.', fixtures: 'standard', latencyMs: [1500], failures: {} },
   'variable-latency': {
     description: 'Seeded random delay between 100 ms and 2 s.',
     fixtures: 'standard',

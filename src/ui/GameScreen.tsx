@@ -27,22 +27,21 @@ export function GameScreen({ onEnd, onExit }: Props) {
     const arena = arenaRef.current
     if (!arena) return
 
-    let cancelled = false
+    const cancellation = new AbortController()
     let started: GameSession | undefined
 
     loadGameTextures(setLoadProgress)
-      .then((textures) => GameSession.start(arena, textures, createGameConfig(options), endMatch))
+      .then((textures) => GameSession.start(arena, textures, createGameConfig(options), endMatch, cancellation.signal))
       .then((newSession) => {
-        if (cancelled) return newSession.destroy()
         started = newSession
-        setSession(newSession)
+        if (newSession) setSession(newSession)
       })
       .catch(() => {
-        if (!cancelled) setLoadFailed(true)
+        if (!cancellation.signal.aborted) setLoadFailed(true)
       })
 
     return () => {
-      cancelled = true
+      cancellation.abort()
       started?.destroy()
       setSession(null)
     }

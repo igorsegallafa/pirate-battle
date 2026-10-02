@@ -5,6 +5,7 @@ import { playSound, setLoopPlaying, type Sound } from './audio'
 import type { GameConfig } from './config'
 import { listenToKeyboard } from './input'
 import { ArenaRenderer } from './renderer'
+import './testApi'
 import {
   STEP_SECONDS,
   createInputState,
@@ -30,19 +31,6 @@ export interface MatchSummary {
   endReason: EndReason
 }
 
-/** Exposed on `window.__pirateBattle` when the URL has `?e2e`, for automated tests and profiling. */
-export interface TestApi {
-  match: Match
-  /** Runs the simulation and rendering for this much game time. Needs `&clock=manual`. */
-  advance(milliseconds: number): void
-}
-
-declare global {
-  interface Window {
-    __pirateBattle?: TestApi
-  }
-}
-
 const urlParams = new URLSearchParams(location.search)
 const TEST_API_ENABLED = urlParams.has('e2e')
 const MANUAL_CLOCK = urlParams.get('clock') === 'manual'
@@ -65,14 +53,20 @@ export class GameSession {
   private listeners = new AbortController()
   private resultTimer?: number
 
+  /** Resolves to nothing when cancelled while PixiJS was still initializing. */
   static async start(
     container: HTMLElement,
     textures: GameTextures,
     config: GameConfig,
     onEnd: (summary: MatchSummary) => void,
-  ): Promise<GameSession> {
+    cancellation: AbortSignal,
+  ): Promise<GameSession | undefined> {
     const app = new Application()
     await app.init({ resizeTo: container, resolution: window.devicePixelRatio, autoDensity: true })
+    if (cancellation.aborted) {
+      app.destroy()
+      return
+    }
     container.appendChild(app.canvas)
     return new GameSession(app, textures, config, onEnd)
   }
@@ -127,7 +121,7 @@ export class GameSession {
     this.app.ticker.remove(this.onTick)
     this.renderer.destroy()
     this.app.destroy(true, { children: true })
-    if (window.__pirateBattle?.match === this.match) delete window.__pirateBattle
+    if (TEST_API_ENABLED) delete window.__pirateBattle
   }
 
   private onTick = (ticker: Ticker): void => {

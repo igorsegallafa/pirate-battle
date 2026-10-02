@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-02T17:31:15.642Z",
+  "date": "2026-10-02T18:16:48.284Z",
   "url": "http://localhost:4173",
   "environment": {
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
@@ -16,63 +16,67 @@
       "sessionSeconds": 180,
       "spawnSeconds": 3
     },
+    "endReason": "time_up",
+    "durationSeconds": 180,
     "frames": 25908,
-    "averageFps": 144,
-    "p95FrameMs": 7.1,
-    "maxFrameMs": 13.9,
-    "framesOver20Ms": 0,
-    "averageEntities": 3.1,
-    "maxEntities": 6,
-    "score": 50
+    "averageFps": 143.98,
+    "p95FrameMs": 7.2,
+    "maxFrameMs": 29.9,
+    "framesOver20Ms": 1,
+    "averageEntities": 3.18,
+    "maxEntities": 7,
+    "score": 48
   },
   "crowdedMatch": {
     "options": {
       "sessionSeconds": 180,
       "spawnSeconds": 1
     },
-    "frames": 22922,
-    "averageFps": 143.98,
-    "p95FrameMs": 7.1,
+    "endReason": "time_up",
+    "durationSeconds": 180,
+    "frames": 25919,
+    "averageFps": 143.99,
+    "p95FrameMs": 7.2,
     "maxFrameMs": 21,
-    "framesOver20Ms": 1,
-    "averageEntities": 54.56,
-    "maxEntities": 118,
+    "framesOver20Ms": 2,
+    "averageEntities": 62.04,
+    "maxEntities": 132,
     "score": 0
   },
   "memory": [
     {
       "cycle": 0,
-      "jsHeapMb": 6.22,
+      "jsHeapMb": 6.24,
       "domNodes": 48,
       "eventListeners": 5
     },
     {
       "cycle": 1,
-      "jsHeapMb": 8.58,
+      "jsHeapMb": 8.61,
       "domNodes": 298,
       "eventListeners": 221
     },
     {
       "cycle": 2,
-      "jsHeapMb": 8.85,
+      "jsHeapMb": 8.3,
       "domNodes": 298,
       "eventListeners": 221
     },
     {
       "cycle": 3,
-      "jsHeapMb": 9.05,
+      "jsHeapMb": 8.54,
       "domNodes": 298,
       "eventListeners": 221
     },
     {
       "cycle": 4,
-      "jsHeapMb": 9.1,
+      "jsHeapMb": 8.59,
       "domNodes": 298,
       "eventListeners": 221
     },
     {
       "cycle": 5,
-      "jsHeapMb": 9.24,
+      "jsHeapMb": 8.72,
       "domNodes": 298,
       "eventListeners": 221
     }

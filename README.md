@@ -5,7 +5,7 @@ as many points as you can before the time runs out.
 
 Ranking and match history are served by a mocked REST API (MSW) and consumed with Axios and TanStack Query.
 
-- Play it: https://pirate-battle-beta.vercel.app
+- Play it: https://pirate-battle-gray.vercel.app
 - Architecture and decisions: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Performance and memory profiling: [reports/PERFORMANCE.md](reports/PERFORMANCE.md)
 - Test report: `reports/playwright/index.html`

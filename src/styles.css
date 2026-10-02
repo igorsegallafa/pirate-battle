@@ -1,0 +1,591 @@
+:root {
+  --cream: #f8e7b9;
+  --gold: #f5c04a;
+  --ink: #3b2408;
+  --navy: #16243a;
+  --danger: #ffb4a2;
+  color-scheme: dark;
+  color: var(--cream);
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #0b2233;
+  touch-action: manipulation;
+}
+
+h1,
+h2,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.75rem;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hint {
+  min-height: 1.2em;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.error {
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+/* Menu screens */
+
+.screen {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 16px;
+  background:
+    linear-gradient(rgb(8 24 38 / 50%), rgb(8 24 38 / 50%)),
+    url('/assets/menu_background.png') center / cover;
+}
+
+/* panel_menu.png is a 2x nine-slice sprite with 40px / 32px logical borders. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 420px);
+  padding: 0.5rem;
+  border: solid transparent;
+  border-width: 40px 32px;
+  border-image: url('/assets/ui/panel_menu.png') 80 64 fill / 40px 32px;
+  text-align: center;
+}
+
+.panel.log {
+  width: min(100%, 860px);
+}
+
+.panel.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  width: min(100%, 720px);
+}
+
+.menu-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+dialog.panel:not([open]) {
+  display: none;
+}
+
+dialog.panel {
+  max-height: calc(100dvh - 16px);
+  margin: auto;
+  overflow: auto;
+  background: none;
+  color: inherit;
+}
+
+dialog::backdrop {
+  background: rgb(8 24 38 / 60%);
+}
+
+.title {
+  display: block;
+  width: min(100%, 320px);
+}
+
+.tagline {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.menu-button {
+  flex: none;
+  width: 240px;
+  height: 82px;
+  border: 0;
+  background: url('/assets/ui/button_primary_normal.png') center / 100% 100%;
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.menu-button:hover {
+  background-image: url('/assets/ui/button_primary_hover.png');
+}
+
+.menu-button:active {
+  background-image: url('/assets/ui/button_primary_pressed.png');
+}
+
+.menu-button.secondary {
+  width: 180px;
+  height: 62px;
+  background-image: url('/assets/ui/button_secondary_normal.png');
+  color: var(--cream);
+  font-size: 0.8rem;
+}
+
+.menu-button.secondary:active {
+  background-image: url('/assets/ui/button_secondary_pressed.png');
+}
+
+.round-button {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: url('/assets/ui/button_round_normal.png') center / 100% 100%;
+}
+
+.round-button:hover {
+  background-image: url('/assets/ui/button_round_hover.png');
+}
+
+.round-button:active {
+  background-image: url('/assets/ui/button_round_pressed.png');
+}
+
+.round-button:disabled {
+  opacity: 0.4;
+}
+
+.round-button img {
+  width: 50%;
+}
+
+/* Phones in landscape: a more compact panel keeps the menus within the screen. */
+@media (max-height: 500px) {
+  .panel {
+    gap: 0.4rem;
+    padding: 0;
+    border-width: 30px 24px;
+    border-image-width: 30px 24px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .menu-button {
+    width: 170px;
+    height: 58px;
+    font-size: 0.95rem;
+  }
+
+  .menu-button.secondary,
+  .tabs .menu-button.primary {
+    width: 150px;
+    height: 52px;
+    font-size: 0.7rem;
+  }
+
+  .title {
+    width: 220px;
+  }
+}
+
+.link-button {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: none;
+  font-weight: 700;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tabs .menu-button.primary {
+  width: 180px;
+  height: 62px;
+  font-size: 0.8rem;
+}
+
+.controls-help {
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.controls-help div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.controls-help dd {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.corner-tools {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.scenario-panel {
+  max-width: 260px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background: var(--navy);
+  font-size: 0.8rem;
+}
+
+.scenario-panel[open] {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.scenario-panel summary {
+  cursor: pointer;
+}
+
+/* Options */
+
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.option {
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stepper input {
+  width: 6rem;
+  padding: 0.4rem;
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  background: var(--navy);
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.stepper input::-webkit-inner-spin-button {
+  appearance: none;
+}
+
+.stepper input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+/* Result */
+
+.match-result {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.score {
+  color: var(--gold);
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.result-details {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Captain's log */
+
+#log-panel {
+  width: 100%;
+  min-height: 16rem;
+}
+
+table {
+  width: 100%;
+  border-spacing: 0 5px;
+  text-align: left;
+}
+
+caption {
+  padding-bottom: 0.3rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+th {
+  padding: 0 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 0.55rem 0.75rem;
+  background: rgb(10 20 35 / 65%);
+  font-weight: 700;
+}
+
+tr.own td {
+  background: rgb(245 192 74 / 28%);
+}
+
+.you-tag {
+  padding: 0 0.3rem;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  color: var(--gold);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.table-status {
+  min-height: 1.2em;
+  font-size: 0.75rem;
+}
+
+.table-message {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Game: the arena keeps a 16:9 box and everything inside it scales with its width. */
+
+.game-screen {
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.arena {
+  position: relative;
+  width: min(100vw, 100dvh * 16 / 9);
+  aspect-ratio: 16 / 9;
+  container-type: inline-size;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.arena canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.rotate-hint {
+  display: none;
+  position: fixed;
+  top: 12px;
+  font-size: 0.85rem;
+}
+
+@media (orientation: portrait) {
+  .rotate-hint {
+    display: block;
+  }
+}
+
+.arena-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+/* 1em is 16px when the arena is at its native 1280px width. */
+.hud,
+.controls {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  font-size: clamp(8px, 1.25cqw, 22px);
+}
+
+.hud {
+  top: 0.75em;
+  left: 0.75em;
+  right: 0.75em;
+  gap: 0.6em;
+  font-weight: 800;
+}
+
+.hud .round-button,
+.controls .round-button {
+  width: max(3.5em, 40px);
+  height: max(3.5em, 40px);
+}
+
+.hud-heart {
+  width: 2.5em;
+}
+
+.health {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 16em;
+  height: 3em;
+  margin-right: auto;
+  background: url('/assets/ui/health_frame.png') center / 100% 100%;
+}
+
+/* The fill occupies the 196x20 rectangle at (30, 15) of the 256x48 frame. */
+.health-fill {
+  position: absolute;
+  left: 1.875em;
+  top: 0.9375em;
+  width: calc(12.25em * var(--ratio));
+  height: 1.25em;
+  background-position: -1.875em -0.9375em;
+  background-size: 16em 3em;
+}
+
+.health span {
+  position: relative;
+  text-shadow: 0 1px 2px #000;
+}
+
+.counter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  width: 10em;
+  height: 3.5em;
+  background: url('/assets/ui/counter_panel.png') center / 100% 100%;
+  font-size: 1em;
+}
+
+.counter img {
+  width: 1.75em;
+}
+
+.counter output,
+.counter span {
+  font-size: 1.4em;
+}
+
+.controls {
+  bottom: 1.5em;
+  gap: 0.75em;
+}
+
+.controls-left {
+  left: 1.5em;
+}
+
+.controls-right {
+  right: 1.5em;
+}
+
+.controls .round-button:nth-child(2) {
+  margin-bottom: 3em;
+}
+
+.controls kbd {
+  position: absolute;
+  top: 100%;
+  font: 700 0.75em inherit;
+  text-shadow: 0 1px 2px #000;
+}
+
+@media (pointer: coarse) {
+  .controls kbd {
+    display: none;
+  }
+}
